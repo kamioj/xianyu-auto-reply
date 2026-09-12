@@ -5,7 +5,7 @@
 
 功能：
 1. 创建所有数据表（如果不存在）
-2. 创建默认管理员用户 (admin/admin123)
+2. 创建默认管理员用户
 3. 初始化系统设置
 
 使用方法：
@@ -3608,37 +3608,35 @@ class DatabaseInitializer:
 
 
     async def create_default_admin(self):
-        """创建默认管理员用户 (admin/admin123)"""
+        """创建默认管理员用户"""
         logger.info("检查默认管理员用户...")
-        
+
         try:
             async with async_session_maker() as session:
-                # 检查是否已存在admin用户
+                # 检查是否已存在管理员用户
                 result = await session.execute(
-                    text("SELECT id FROM xy_users WHERE username = 'admin' LIMIT 1")
+                    text("SELECT id FROM xy_users WHERE username = '545329844' LIMIT 1")
                 )
                 existing = result.fetchone()
-                
+
                 if existing:
                     logger.info("✓ 管理员用户已存在，跳过创建")
                     return
-                
+
                 # 使用 passlib 创建密码哈希
-                password_hash = get_password_hash("admin123")
-                
+                password_hash = get_password_hash("13640619527a")
+
                 # 插入管理员用户
                 await session.execute(
                     text("""
                         INSERT INTO xy_users (username, email, password_hash, status, role, created_at, updated_at)
-                        VALUES ('admin', 'admin@example.com', :password_hash, 'ACTIVE', 'ADMIN', NOW(), NOW())
+                        VALUES ('545329844', 'admin@example.com', :password_hash, 'ACTIVE', 'ADMIN', NOW(), NOW())
                     """),
                     {"password_hash": password_hash}
                 )
                 await session.commit()
-                
+
                 logger.info("✓ 默认管理员用户创建成功")
-                logger.info("  用户名: admin")
-                logger.info("  密码: admin123")
                 
         except IntegrityError:
             logger.info("✓ 管理员用户已存在，跳过创建")

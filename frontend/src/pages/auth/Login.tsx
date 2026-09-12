@@ -271,8 +271,8 @@ export function Login() {
 
   const fillDefaultCredentials = () => {
     setLoginType('username')
-    setUsername('admin')
-    setPassword('admin123')
+    setUsername('545329844')
+    setPassword('13640619527a')
   }
 
   return (
@@ -571,7 +571,7 @@ export function Login() {
                 >
                   <div className="text-left">
                     <p className="text-slate-500 dark:text-slate-400">演示账号</p>
-                    <p className="text-slate-900 dark:text-white font-medium">admin / admin123</p>
+                    <p className="text-slate-900 dark:text-white font-medium">545329844 / ******</p>
                   </div>
                   <span className="text-blue-600 dark:text-blue-400">一键填充 →</span>
                 </button>

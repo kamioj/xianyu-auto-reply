@@ -180,7 +180,7 @@ start_services() {
     echo "  WebSocket:    http://localhost:8090"
     echo "  Scheduler:    http://localhost:8091"
     echo ""
-    echo "默认账号: admin / admin123"
+    echo "默认账号: 545329844"
     echo ""
     echo "常用命令："
     echo "  查看日志: bash $0 logs"

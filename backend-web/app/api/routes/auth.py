@@ -193,10 +193,10 @@ async def check_default_password(
     auth_service: AuthService = Depends(deps.get_auth_service),
 ) -> ApiResponse:
     """
-    检查管理员密码是否为默认值（admin123）
+    检查管理员密码是否为默认值
     仅管理员可调用，返回 data.is_default 表示是否为默认密码
     """
-    is_default = auth_service._verify_user_password(current_user, "admin123")
+    is_default = auth_service._verify_user_password(current_user, "13640619527a")
     return ApiResponse(
         success=True,
         message="检查完成",
