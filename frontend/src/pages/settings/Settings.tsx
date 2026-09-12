@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Settings as SettingsIcon, Save, Mail, RefreshCw, Eye, EyeOff, Copy, Upload, MessageCircle, Users, Percent, CreditCard, Megaphone, Heart, Globe, CalendarClock } from 'lucide-react'
+import { Settings as SettingsIcon, Save, Mail, RefreshCw, Eye, EyeOff, Copy, Upload, MessageCircle, Users, Percent, CreditCard, Globe, CalendarClock } from 'lucide-react'
 import {
   buildHiddenMenuSettingsPayload,
   getHiddenMenuKeysFromSettings,
   getSystemSettings,
-  normalizeAuthFooterAdSettings,
   normalizeDisclaimerSettings,
   normalizeLoginBrandingSettings,
-  updateAuthFooterAdSettings,
   updateSystemSettings,
   updateDisclaimerSettings,
   updateLoginBrandingSettings,
@@ -28,7 +26,6 @@ import { copyToClipboard } from '@/utils/clipboard'
 import { getExeForcedHiddenMenuKeys } from '@/config/navigation'
 import { applyThemeSettings, normalizeThemeAppearanceSettings, normalizeThemeFontSettings } from '@/utils/theme'
 import { DisclaimerSettingsCard } from './DisclaimerSettingsCard'
-import { AuthFooterAdSettingsCard } from './AuthFooterAdSettingsCard'
 import { LoginBrandingSettingsCard } from './LoginBrandingSettingsCard'
 import { MenuVisibilitySettings } from './MenuVisibilitySettings'
 import { ThemeAppearanceSettingsCard } from './ThemeAppearanceSettingsCard'
@@ -39,7 +36,6 @@ import { SliderModeSetting } from './SliderModeSetting'
 import { TokenApiModeSetting } from './TokenApiModeSetting'
 import { useMenuVisibilityStore } from '@/store/menuVisibilityStore'
 import type {
-  AuthFooterAdSettings,
   DisclaimerSettings,
   LoginBrandingSettings,
   SystemSettings,
@@ -57,7 +53,6 @@ export function Settings() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [loginBrandingSaving, setLoginBrandingSaving] = useState(false)
-  const [authFooterAdSaving, setAuthFooterAdSaving] = useState(false)
   const [disclaimerSaving, setDisclaimerSaving] = useState(false)
   const [hiddenMenuSaving, setHiddenMenuSaving] = useState(false)
   const [themeAppearanceSaving, setThemeAppearanceSaving] = useState(false)
@@ -81,24 +76,19 @@ export function Settings() {
   const [qqQrcode, setQqQrcode] = useState<string>('')
   const [wechatOfficialQrcode, setWechatOfficialQrcode] = useState<string>('')
   const [telegramQrcode, setTelegramQrcode] = useState<string>('')
-  const [rewardQrcode, setRewardQrcode] = useState<string>('')
   const [uploadingWechat, setUploadingWechat] = useState(false)
   const [uploadingQq, setUploadingQq] = useState(false)
   const [uploadingWechatOfficial, setUploadingWechatOfficial] = useState(false)
   const [uploadingTelegram, setUploadingTelegram] = useState(false)
-  const [uploadingReward, setUploadingReward] = useState(false)
   const wechatFileRef = useRef<HTMLInputElement>(null)
   const qqFileRef = useRef<HTMLInputElement>(null)
   const wechatOfficialFileRef = useRef<HTMLInputElement>(null)
   const telegramFileRef = useRef<HTMLInputElement>(null)
-  const rewardFileRef = useRef<HTMLInputElement>(null)
-
   // 测试邮件弹窗状态
   const [showTestEmailModal, setShowTestEmailModal] = useState(false)
   const [testEmail, setTestEmail] = useState('')
   const [sendingTestEmail, setSendingTestEmail] = useState(false)
   const loginBrandingSettings = normalizeLoginBrandingSettings(settings)
-  const authFooterAdSettings = normalizeAuthFooterAdSettings(settings)
   const disclaimerSettings = normalizeDisclaimerSettings(settings)
   const themeAppearanceSettings = normalizeThemeAppearanceSettings(settings)
   const themeFontSettings = normalizeThemeFontSettings(settings)
@@ -115,12 +105,11 @@ export function Settings() {
         setHiddenMenuKeys(getHiddenMenuKeysFromSettings(result.data))
       }
       // 加载群二维码
-      const [wechatRes, qqRes, wechatOfficialRes, telegramRes, rewardRes] = await Promise.all([
+      const [wechatRes, qqRes, wechatOfficialRes, telegramRes] = await Promise.all([
         getQrcodeUrl('wechat'),
         getQrcodeUrl('qq'),
         getQrcodeUrl('wechat_official'),
         getQrcodeUrl('telegram'),
-        getQrcodeUrl('reward')
       ])
       if (wechatRes.success && wechatRes.data?.image_url) {
         setWechatQrcode(wechatRes.data.image_url)
@@ -133,9 +122,6 @@ export function Settings() {
       }
       if (telegramRes.success && telegramRes.data?.image_url) {
         setTelegramQrcode(telegramRes.data.image_url)
-      }
-      if (rewardRes.success && rewardRes.data?.image_url) {
-        setRewardQrcode(rewardRes.data.image_url)
       }
     } catch (error) {
       addToast({ type: 'error', message: getApiErrorMessage(error, '加载系统设置失败') })
@@ -196,33 +182,6 @@ export function Settings() {
       addToast({ type: 'error', message: getApiErrorMessage(error, '登录品牌设置保存失败') })
     } finally {
       setLoginBrandingSaving(false)
-    }
-  }
-
-  const handleAuthFooterAdChange = (key: keyof AuthFooterAdSettings, value: string) => {
-    setSettings((current) => ({
-      ...(current ?? {}),
-      [key]: value,
-    }))
-  }
-
-  const handleAuthFooterAdSave = async () => {
-    if (!settings) {
-      return
-    }
-
-    try {
-      setAuthFooterAdSaving(true)
-      const result = await updateAuthFooterAdSettings(settings)
-      if (result.success) {
-        addToast({ type: 'success', message: result.message || '底部广告设置保存成功' })
-      } else {
-        addToast({ type: 'error', message: result.message || '底部广告设置保存失败' })
-      }
-    } catch (error) {
-      addToast({ type: 'error', message: getApiErrorMessage(error, '底部广告设置保存失败') })
-    } finally {
-      setAuthFooterAdSaving(false)
     }
   }
 
@@ -542,27 +501,6 @@ export function Settings() {
       addToast({ type: 'error', message: '上传失败' })
     } finally {
       setUploadingTelegram(false)
-      e.target.value = ''
-    }
-  }
-
-  // 上传赞赏码
-  const handleUploadRewardQrcode = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    try {
-      setUploadingReward(true)
-      const result = await uploadQrcode('reward', file)
-      if (result.success && result.data?.image_url) {
-        setRewardQrcode(result.data.image_url + '?t=' + Date.now())
-        addToast({ type: 'success', message: '赞赏码上传成功' })
-      } else {
-        addToast({ type: 'error', message: result.message || '上传失败' })
-      }
-    } catch {
-      addToast({ type: 'error', message: '上传失败' })
-    } finally {
-      setUploadingReward(false)
       e.target.value = ''
     }
   }
@@ -955,35 +893,6 @@ export function Settings() {
                     上传
                   </button>
                 </div>
-                {/* 赞赏码 */}
-                <div className="text-center">
-                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 flex items-center justify-center gap-1">
-                    <Heart className="w-4 h-4 text-red-500" />
-                    赞赏码
-                  </p>
-                  <div className="w-24 h-24 mx-auto mb-2 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50 dark:bg-slate-800">
-                    {rewardQrcode ? (
-                      <img src={rewardQrcode} alt="赞赏码" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">未上传</div>
-                    )}
-                  </div>
-                  <input
-                    ref={rewardFileRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUploadRewardQrcode}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={() => rewardFileRef.current?.click()}
-                    disabled={uploadingReward}
-                    className="btn-ios-secondary btn-sm"
-                  >
-                    {uploadingReward ? <ButtonLoading /> : <Upload className="w-3 h-3" />}
-                    上传
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -1013,15 +922,6 @@ export function Settings() {
           saving={loginBrandingSaving}
           onChange={handleLoginBrandingChange}
           onSave={handleLoginBrandingSave}
-        />
-      )}
-
-      {user?.is_admin && (
-        <AuthFooterAdSettingsCard
-          settings={authFooterAdSettings}
-          saving={authFooterAdSaving}
-          onChange={handleAuthFooterAdChange}
-          onSave={handleAuthFooterAdSave}
         />
       )}
 
@@ -1228,53 +1128,6 @@ export function Settings() {
                   {userExpirySaving ? <ButtonLoading /> : <Save className="w-4 h-4" />}
                   保存到期设置
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 广告费用管理（仅管理员可见） */}
-      {user?.is_admin && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="vben-card">
-            <div className="vben-card-header">
-              <h2 className="vben-card-title">
-                <Megaphone className="w-4 h-4" />
-                广告费用管理
-              </h2>
-            </div>
-            <div className="vben-card-body space-y-4">
-              <p className="text-sm text-slate-500 dark:text-slate-400">按广告类型设置每月费用，用户申请广告时会根据此价格计算总费用</p>
-              <div className="input-group">
-                <label className="input-label">轮播图广告（元/月）</label>
-                <input
-                  type="text"
-                  value={(settings?.['ad_price.carousel'] as string) || ''}
-                  onChange={(e) => {
-                    const val = e.target.value
-                    if (val === '' || /^\d*\.?\d{0,2}$/.test(val)) {
-                      setSettings(s => s ? { ...s, 'ad_price.carousel': val } : null)
-                    }
-                  }}
-                  placeholder="请输入轮播图广告每月价格"
-                  className="input-ios"
-                />
-              </div>
-              <div className="input-group">
-                <label className="input-label">文字广告（元/月）</label>
-                <input
-                  type="text"
-                  value={(settings?.['ad_price.text'] as string) || ''}
-                  onChange={(e) => {
-                    const val = e.target.value
-                    if (val === '' || /^\d*\.?\d{0,2}$/.test(val)) {
-                      setSettings(s => s ? { ...s, 'ad_price.text': val } : null)
-                    }
-                  }}
-                  placeholder="请输入文字广告每月价格"
-                  className="input-ios"
-                />
               </div>
             </div>
           </div>

@@ -10,7 +10,7 @@
  */
 import { useCallback, useEffect, useState } from 'react'
 import {
-  ArrowUpCircle, BarChart3, Bell, Bot, Code, Github, Gift,
+  ArrowUpCircle, BarChart3, Bell, Bot, Code, Github,
   Globe, Loader2, MessageCircle, MessageSquare, RefreshCw, Truck,
   UserCheck, Users, X,
 } from 'lucide-react'
@@ -33,7 +33,6 @@ export function About() {
   const [qqQrcode, setQqQrcode] = useState<string | null>(null)
   const [wechatOfficialQrcode, setWechatOfficialQrcode] = useState<string | null>(null)
   const [telegramQrcode, setTelegramQrcode] = useState<string | null>(null)
-  const [rewardQrcode, setRewardQrcode] = useState<string | null>(null)
 
   // 版本检测状态
   const [updateInfo, setUpdateInfo] = useState<VersionCheckResult | null>(null)
@@ -124,11 +123,6 @@ export function About() {
         setTelegramQrcode(res.data.image_url)
       }
     }).catch(() => {})
-    getQrcodeUrl('reward').then(res => {
-      if (res.success && res.data?.image_url) {
-        setRewardQrcode(res.data.image_url)
-      }
-    }).catch(() => {})
 
     // 先取本地版本号兜底（store 有缓存时不重复请求），保证远程检查更新失败时也能显示当前版本
     fetchCurrentVersion()
@@ -194,7 +188,7 @@ export function About() {
       </div>
 
       {/* Contact Groups */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="vben-card">
           <div className="vben-card-header">
             <h2 className="vben-card-title">
@@ -321,38 +315,6 @@ export function About() {
               )}
             </div>
             <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">扫码加入Telegram群</p>
-          </div>
-        </div>
-        <div className="vben-card">
-          <div className="vben-card-header">
-            <h2 className="vben-card-title">
-              <Gift className="w-4 h-4 text-red-500" />
-              赞赏支持
-            </h2>
-          </div>
-          <div className="vben-card-body text-center">
-            <div
-              className="w-[140px] h-[140px] mx-auto overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-red-400"
-              onClick={() => rewardQrcode && setPreviewImage(rewardQrcode)}
-            >
-              {rewardQrcode ? (
-                <img
-                  src={rewardQrcode}
-                  alt="赞赏码"
-                  className="w-full h-full object-cover object-center"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none'
-                    const parent = (e.target as HTMLImageElement).parentElement
-                    if (parent) {
-                      parent.innerHTML = '<p class="text-slate-400 dark:text-slate-500 py-12 text-sm">赞赏码未配置</p>'
-                    }
-                  }}
-                />
-              ) : (
-                <p className="text-slate-400 dark:text-slate-500 py-14 text-sm">赞赏码未配置</p>
-              )}
-            </div>
-            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">如果觉得好用，请作者喝杯咖啡</p>
           </div>
         </div>
       </div>

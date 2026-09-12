@@ -30,11 +30,9 @@ import {
   Filter,
   MessageSquarePlus,
   Repeat,
-  Megaphone,
   Star,
   Timer,
   ScrollText,
-  Image,
   Circle,
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -270,37 +268,13 @@ const tutorialData: TutorialSection[] = [
           { id: 'tasks-run', title: '立即执行', description: '手动触发定时任务。' },
         ],
       },
-      {
-        id: 'admin-announcements',
-        icon: Megaphone,
-        title: '公告管理',
-        description: '发布和管理系统公告。',
-        children: [
-          { id: 'announcements-add', title: '添加公告', description: '发布新的系统公告。' },
-          { id: 'announcements-edit', title: '编辑', description: '修改公告内容。' },
-          { id: 'announcements-delete', title: '删除', description: '删除公告。' },
-          { id: 'announcements-toggle', title: '启用/禁用', description: '切换公告的显示状态。' },
-        ],
-      },
-      {
-        id: 'admin-ad-manage',
-        icon: Image,
-        title: '广告管理',
-        description: '管理系统广告位和广告内容。',
-        children: [
-          { id: 'ad-add', title: '添加广告', description: '创建新的广告。' },
-          { id: 'ad-edit', title: '编辑', description: '修改广告内容。' },
-          { id: 'ad-delete', title: '删除', description: '删除广告。' },
-          { id: 'ad-audit', title: '审核', description: '审核用户提交的广告申请。' },
-        ],
-      },
     ],
   },
   {
     id: 'other',
     icon: Info,
     title: '其他功能',
-    description: '意见反馈、广告申请、免责声明、关于等辅助功能。',
+    description: '意见反馈、免责声明、关于等辅助功能。',
     children: [
       {
         id: 'feedback',
@@ -309,15 +283,6 @@ const tutorialData: TutorialSection[] = [
         description: '提交使用过程中遇到的问题或建议。',
         children: [
           { id: 'feedback-submit', title: '提交反馈', description: '提交新的意见或建议。' },
-        ],
-      },
-      {
-        id: 'ad-apply',
-        icon: Image,
-        title: '广告申请',
-        description: '申请在系统中投放广告。',
-        children: [
-          { id: 'ad-apply-submit', title: '提交申请', description: '提交广告投放申请。' },
         ],
       },
       {
