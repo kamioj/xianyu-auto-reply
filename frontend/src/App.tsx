@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState, useRef } from 'react'
+import React, { Component, Suspense, useEffect, useState, useRef } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { MainLayout } from '@/components/layout/MainLayout'
@@ -106,6 +106,38 @@ function PageLoading() {
       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
     </div>
   )
+}
+
+// chunk 加载失败时的错误边界，避免 loading 永远转圈
+class ChunkLoadErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full min-h-[200px] gap-4">
+          <p className="text-slate-600 dark:text-slate-300 text-sm">页面加载失败，请刷新重试</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            刷新页面
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
 
 // 免责声明同意状态的 key
@@ -309,6 +341,7 @@ function App() {
   return (
     <BrowserRouter>
       <Toast />
+      <ChunkLoadErrorBoundary>
       <Suspense fallback={<PageLoading />}>
         <Routes>
           {/* Public routes */}
@@ -418,6 +451,7 @@ function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>
+      </ChunkLoadErrorBoundary>
     </BrowserRouter>
   )
 }
